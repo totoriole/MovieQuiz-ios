@@ -1,10 +1,10 @@
-////
-////  MovieQuizTestsLaunchTests.swift
-////  MovieQuizTests
-////
-////  Created by Toto Tsipun on 09.03.2023.
-////
 //
+//  MovieQuizTestsLaunchTests.swift
+//  MovieQuizTests
+//
+//  Created by Toto Tsipun on 09.03.2023.
+//
+
 //import XCTest
 //
 //final class MovieQuizTestsLaunchTests: XCTestCase {

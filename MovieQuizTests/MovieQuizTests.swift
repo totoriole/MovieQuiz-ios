@@ -1,10 +1,10 @@
-////
-////  MovieQuizTests.swift
-////  MovieQuizTests
-////
-////  Created by Toto Tsipun on 09.03.2023.
-////
 //
+//  MovieQuizTests.swift
+//  MovieQuizTests
+//
+//  Created by Toto Tsipun on 09.03.2023.
+//
+
 //import XCTest
 //
 //struct ArithmeticOperations {
