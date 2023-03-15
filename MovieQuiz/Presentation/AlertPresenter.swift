@@ -14,7 +14,7 @@ final class AlertPresenter: AlertPresenterProtocol {
         self.viewController = viewController
     }
     
-    func present(model: AlertModel) {
+    func presentAlert(model: AlertModel) {
         let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
         alert.view.accessibilityIdentifier = "id"
         let action = UIAlertAction(title: model.buttonText, style: .default, handler: { _ in

@@ -14,7 +14,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     private var correctAnswers: Int = 0
-    private var currentQuestion: QuizQuestion?
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenterProtocol?
     private var statisticService: StatisticService = StatisticServiceImplementation()
@@ -50,10 +49,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let self = self else { return }
             self.questionFactory?.loadData()
         }
-        alertPresenter?.present(model: model)
+        alertPresenter?.presentAlert(model: model)
     }
     
-    private func showQuestion(quiz step: QuizStepViewModel) {
+    func showQuestion(quiz step: QuizStepViewModel) {
         // здесь мы заполняем нашу картинку, текст и счётчик данными
         imageView.image = step.image
         textLabel.text = step.question
@@ -75,7 +74,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let question = question else {
             return
         }
-        currentQuestion = question
+        presenter.currentQuestion = question
         let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.showQuestion(quiz: viewModel)
@@ -117,11 +116,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             let alert = AlertModel(title: "Этот раунд окончен!", message: textMessage, buttonText: "Cыграть еще раз") { [weak self] in
                 guard let self = self else { return }
                 self.presenter.resetQuestionIndex()
-                guard let currentQuestion = self.currentQuestion else { return }
+                guard let currentQuestion = self.presenter.currentQuestion else { return }
                 let firstQuestionModel = self.presenter.convert(model: currentQuestion)
                 self.showQuestion(quiz: firstQuestionModel)
             }
-            alertPresenter?.present(model: alert)
+            alertPresenter?.presentAlert(model: alert)
             correctAnswers = 0
             questionFactory?.requestNextQuestion()
         } else {
@@ -134,13 +133,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Actions
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         // проверка ответа
-        presenter.currentQuestion = currentQuestion
         presenter.noButtonClicked()
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         // проверка ответа
-        presenter.currentQuestion = currentQuestion
         presenter.yesButtonClicked()
     }
 }
