@@ -14,7 +14,7 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     private var alertPresenter: AlertPresenterProtocol?
-    private var statisticService: StatisticService = StatisticServiceImplementation()
+//    private var statisticService: StatisticService = StatisticServiceImplementation()
     private var presenter: MovieQuizPresenter!
     
     // отображение индикатора загрузки
@@ -54,27 +54,19 @@ final class MovieQuizViewController: UIViewController {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
         alertPresenter = AlertPresenter(viewController: self)
-        statisticService = StatisticServiceImplementation()
+//        statisticService = StatisticServiceImplementation()
         showLoadingIndicator()
     }
     
     func showAnswerResult(isCorrect: Bool) {
-//        presenter.didAnswer(isYes: isCorrect)
         // отображаем результат ответа (выделяем рамкой верный или неверный ответ)
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        imageView.layer.cornerRadius = 20
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen?.cgColor : UIColor.ypRed?.cgColor
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
-        if isCorrect {
-            presenter.correctAnswers += 1
-        }
+        presenter.didAnswer(isCorrect: isCorrect)
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            self.imageView.layer.borderWidth = 0
-            self.noButton.isEnabled = true
-            self.yesButton.isEnabled = true
             self.presenter.showQuestionOrResult()
         }
     }
