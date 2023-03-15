@@ -52,6 +52,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter?.presentAlert(model: model)
     }
     
+    func presentAlert(model: AlertModel) {
+        alertPresenter?.presentAlert(model: model)
+    }
+    
     func showQuestion(quiz step: QuizStepViewModel) {
         // здесь мы заполняем нашу картинку, текст и счётчик данными
         imageView.image = step.image
@@ -90,36 +94,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.imageView.layer.borderWidth = 0
             self.noButton.isEnabled = true
             self.yesButton.isEnabled = true
-            self.showQuestionOrResult()
-        }
-    }
-    
-    private func showQuestionOrResult() {
-        
-        if presenter.isLastQuestion() {
-            // показать результат квизa
-            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
-            let textMessage =
-            """
-            Ваш результат: \(correctAnswers) из 10,
-            Количество сыгранных квизов: \(statisticService.gamesCount)
-            Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
-            Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
-            """
-            let alert = AlertModel(title: "Этот раунд окончен!", message: textMessage, buttonText: "Cыграть еще раз") { [weak self] in
-                guard let self = self else { return }
-                self.presenter.resetQuestionIndex()
-                guard let currentQuestion = self.presenter.currentQuestion else { return }
-                let firstQuestionModel = self.presenter.convert(model: currentQuestion)
-                self.showQuestion(quiz: firstQuestionModel)
-            }
-            alertPresenter?.presentAlert(model: alert)
-            correctAnswers = 0
-            questionFactory?.requestNextQuestion()
-        } else {
-            presenter.switchToNextQuestion()
-            // показать следующий вопрос
-            questionFactory?.requestNextQuestion()
+            self.presenter.correctAnswers = self.correctAnswers
+            self.presenter.questionFactory = self.questionFactory
+            self.presenter.showQuestionOrResult()
         }
     }
     

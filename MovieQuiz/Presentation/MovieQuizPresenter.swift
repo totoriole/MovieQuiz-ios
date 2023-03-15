@@ -10,7 +10,7 @@ import UIKit
 final class MovieQuizPresenter {
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
-    private var questionFactory: QuestionFactoryProtocol?
+    var questionFactory: QuestionFactoryProtocol?
     var currentQuestion: QuizQuestion?
     weak var viewController: MovieQuizViewController?
     var statisticService: StatisticService = StatisticServiceImplementation()
@@ -63,31 +63,34 @@ final class MovieQuizPresenter {
         }
     }
     
-    private func showQuestionOrResult() {
+    func showQuestionOrResult() {
         
         if self.isLastQuestion() {
             // показать результат квизa
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
-            let textMessage =
-            """
-            Ваш результат: \(correctAnswers) из 10,
-            Количество сыгранных квизов: \(statisticService.gamesCount)
-            Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
+            statisticService.store(correct: correctAnswers, total: self.questionsAmount)
+            let text = """
+            Ваш результат: \(correctAnswers) из 10
+            Количество сыграных квизов: \(statisticService.gamesCount)
+            Рекорд: \(statisticService.bestGame.correct ) /\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
             Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
             """
-            let alert = AlertModel(title: "Этот раунд окончен!", message: textMessage, buttonText: "Cыграть еще раз") { [weak self] in
-                guard let self = self else { return }
-                self.resetQuestionIndex()
-                guard let currentQuestion = self.currentQuestion else { return }
-                let firstQuestionModel = self.convert(model: currentQuestion)
-                self.viewController?.showQuestion(quiz: firstQuestionModel)
-            }
-            alertPresenter?.presentAlert(model: alert)
+            let alertModel: AlertModel = AlertModel(
+                title: "Этот раунд окончен!",
+                message: text,
+                buttonText: "Сыграть еще раз") { [weak self] in
+                    guard let self = self  else { return nil }
+                    return self.restartGame()
+                }
+            viewController?.presentAlert(model: alertModel)
             correctAnswers = 0
-            questionFactory?.requestNextQuestion()
         } else {
             self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
+    }
+    func restartGame() {
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        questionFactory?.requestNextQuestion()
     }
 }
