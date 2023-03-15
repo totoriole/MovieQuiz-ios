@@ -45,10 +45,10 @@ final class MovieQuizPresenter {
         didAnswer(isYes: false)
     }
     
-    private func didAnswer(isYes: Bool) {
+    func didAnswer(isYes: Bool) {
         // проверка ответа
-        let userAnswer = isYes
         guard let currentQuestion = currentQuestion else { return }
+        let userAnswer = isYes
         viewController?.showAnswerResult(isCorrect: userAnswer == currentQuestion.correctAnswer)
     }
     

@@ -13,7 +13,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
-    private var correctAnswers: Int = 0
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenterProtocol?
     private var statisticService: StatisticService = StatisticServiceImplementation()
@@ -48,6 +47,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let model = AlertModel(title: "Ошибка", message: message, buttonText: "Попробуйте еще раз"){ [weak self] in
         guard let self = self else { return }
             self.questionFactory?.loadData()
+            self.presenter.restartGame()
         }
         alertPresenter?.presentAlert(model: model)
     }
@@ -79,6 +79,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func showAnswerResult(isCorrect: Bool) {
+//        presenter.didAnswer(isYes: isCorrect)
         // отображаем результат ответа (выделяем рамкой верный или неверный ответ)
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
@@ -87,14 +88,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         noButton.isEnabled = false
         yesButton.isEnabled = false
         if isCorrect {
-            correctAnswers += 1
+            presenter.correctAnswers += 1
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.imageView.layer.borderWidth = 0
             self.noButton.isEnabled = true
             self.yesButton.isEnabled = true
-            self.presenter.correctAnswers = self.correctAnswers
             self.presenter.questionFactory = self.questionFactory
             self.presenter.showQuestionOrResult()
         }
