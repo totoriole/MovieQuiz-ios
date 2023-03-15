@@ -14,12 +14,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     private var correctAnswers: Int = 0
-    private var currentQuestionIndex: Int = 0
-    private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     private var alertPresenter: AlertPresenterProtocol?
     private var statisticService: StatisticService = StatisticServiceImplementation()
+    private let presenter = MovieQuizPresenter()
     
     // скрываем индикатор и показываем новый экран
     func didLoadDataFromServer() {
@@ -54,14 +53,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter?.present(model: model)
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        // преобразовываем данные модели вопроса в те, что нужно показать на экране
-        return QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-    }
-    
     private func showQuestion(quiz step: QuizStepViewModel) {
         // здесь мы заполняем нашу картинку, текст и счётчик данными
         imageView.image = step.image
@@ -84,7 +75,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             return
         }
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.showQuestion(quiz: viewModel)
         }
@@ -112,9 +103,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showQuestionOrResult() {
         
-        if currentQuestionIndex == questionsAmount - 1 { // - 1 потому что индекс начинается с 0, а длинна массива — с 1
+        if presenter.isLastQuestion() {
             // показать результат квизa
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
             let textMessage =
             """
             Ваш результат: \(correctAnswers) из 10,
@@ -124,16 +115,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             """
             let alert = AlertModel(title: "Этот раунд окончен!", message: textMessage, buttonText: "Cыграть еще раз") { [weak self] in
                 guard let self = self else { return }
-                self.currentQuestionIndex = 0
+                self.presenter.resetQuestionIndex()
                 guard let currentQuestion = self.currentQuestion else { return }
-                let firstQuestionModel = self.convert(model: currentQuestion)
+                let firstQuestionModel = self.presenter.convert(model: currentQuestion)
                 self.showQuestion(quiz: firstQuestionModel)
             }
             alertPresenter?.present(model: alert)
             correctAnswers = 0
             questionFactory?.requestNextQuestion()
         } else {
-            currentQuestionIndex += 1 // увеличиваем индекс текущего урока на 1; таким образом мы сможем получить следующий вопрос
+            presenter.switchToNextQuestion()
             // показать следующий вопрос
             questionFactory?.requestNextQuestion()
         }
