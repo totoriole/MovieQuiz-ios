@@ -80,7 +80,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         // проверка ответа
         guard let currentQuestion = currentQuestion else { return }
         let userAnswer = isYes
-        viewController?.showAnswerResult(isCorrect: userAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: userAnswer == currentQuestion.correctAnswer)
     }
     
     func didAnswer(isCorrect: Bool) {
@@ -89,26 +89,15 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-//    func showAnswerResult(isCorrect: Bool) {
-//        // отображаем результат ответа (выделяем рамкой верный или неверный ответ)
-//        imageView.layer.masksToBounds = true
-//        imageView.layer.borderWidth = 8
-//        imageView.layer.cornerRadius = 20
-//        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen?.cgColor : UIColor.ypRed?.cgColor
-//        noButton.isEnabled = false
-//        yesButton.isEnabled = false
-//        presenter.didAnswer(isCorrect: isCorrect)
-////        if isCorrect {
-////            presenter.correctAnswers += 1
-////        }
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-//            guard let self = self else { return }
-//            self.imageView.layer.borderWidth = 0
-//            self.noButton.isEnabled = true
-//            self.yesButton.isEnabled = true
-//            self.presenter.showQuestionOrResult()
-//        }
-//    }
+    func showAnswerResult(isCorrect: Bool) {
+        // отображаем результат ответа (выделяем рамкой верный или неверный ответ)
+        didAnswer(isCorrect: isCorrect)
+        viewController?.highlightImageBorder(isCorrect: isCorrect)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.showQuestionOrResult()
+        }
+    }
     
     func showQuestionOrResult() {
         
