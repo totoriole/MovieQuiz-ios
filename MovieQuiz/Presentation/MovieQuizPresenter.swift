@@ -110,20 +110,35 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             Рекорд: \(statisticService.bestGame.correct ) /\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
             Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
             """
-            let alertModel: AlertModel = AlertModel(
-                title: "Этот раунд окончен!",
-                message: text,
-                buttonText: "Сыграть еще раз") { [weak self] in
-                    guard let self = self  else { return nil }
-                    return self.restartGame()
-                }
-            viewController?.presentAlert(model: alertModel)
+            let alertModel = QuizResultsViewModel(title: "Этот раунд окончен!",
+                                                  text: text,
+                                                  buttonText: "Сыграть еще раз")
+            viewController?.show(model: alertModel)
             correctAnswers = 0
         } else {
             self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
     }
+    
+    func makeResultsMessage() -> String {
+           statisticService.store(correct: correctAnswers, total: questionsAmount)
+
+           let bestGame = statisticService.bestGame
+
+           let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
+           let currentGameResultLine = "Ваш результат: \(correctAnswers)\\\(questionsAmount)"
+           let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
+           + " (\(bestGame.date.dateTimeString))"
+           let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
+
+           let resultMessage = [
+           currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
+           ].joined(separator: "\n")
+
+           return resultMessage
+       }
+    
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0

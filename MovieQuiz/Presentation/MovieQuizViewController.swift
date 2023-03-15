@@ -13,7 +13,6 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
-    private var alertPresenter: AlertPresenterProtocol?
     private var presenter: MovieQuizPresenter!
     
     // отображение индикатора загрузки
@@ -31,15 +30,28 @@ final class MovieQuizViewController: UIViewController {
     func showNetworkError(message: String) {
         hideLoadingIndicator()
         
-        let model = AlertModel(title: "Ошибка", message: message, buttonText: "Попробуйте еще раз"){ [weak self] in
-        guard let self = self else { return }
+        let model = UIAlertController(title: "Ошибка",
+                                      message: message,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "Попробовать ещё раз", style: .default) { [weak self] _ in
+            guard let self = self else { return }
             self.presenter.restartGame()
         }
-        alertPresenter?.presentAlert(model: model)
+        model.addAction(action)
     }
     
-    func presentAlert(model: AlertModel) {
-        alertPresenter?.presentAlert(model: model)
+    func show(model: QuizResultsViewModel) {
+        let message = presenter.makeResultsMessage()
+        
+        let alert = UIAlertController(title: model.title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: model.buttonText, style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.presenter.restartGame()
+        }
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
     }
     
     func showQuestion(quiz step: QuizStepViewModel) {
@@ -52,8 +64,6 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
-        alertPresenter = AlertPresenter(viewController: self)
-//        statisticService = StatisticServiceImplementation()
         showLoadingIndicator()
     }
     
