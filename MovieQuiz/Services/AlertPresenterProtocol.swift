@@ -7,5 +7,5 @@
 import UIKit
 
 protocol AlertPresenterProtocol: AnyObject {
-    func present(model: AlertModel)
+    func presentAlert(model: AlertModel)
 }

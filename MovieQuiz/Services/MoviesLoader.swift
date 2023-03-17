@@ -23,10 +23,14 @@ struct MoviesLoader: MoviesLoadingProtocol {
     }
     
     // MARK: - NetworkClient
-    private let networkClient = NetworkClient()
+    private let networkClient: NetworkRouting
+    
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClient = networkClient
+    }
     
     // MARK: - URL
-    private var moviesUrl: URL {
+    private var mostPopularMoviesUrl: URL {
         guard let url = URL(string: "https://imdb-api.com/en/API/Top250Movies/k_w088cmg0") else {
             preconditionFailure("Unable to construct moviesUrl")
         }
@@ -34,7 +38,7 @@ struct MoviesLoader: MoviesLoadingProtocol {
     }
     
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
-        networkClient.fetch(url: moviesUrl) { result in
+        networkClient.fetch(url: mostPopularMoviesUrl) { result in
             switch result {
             case .failure(let error): handler(.failure(error))
             case .success(let data):
