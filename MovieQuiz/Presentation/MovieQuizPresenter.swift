@@ -80,7 +80,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         // проверка ответа
         guard let currentQuestion = currentQuestion else { return }
         let userAnswer = isYes
-        showAnswerResult(isCorrect: userAnswer == currentQuestion.correctAnswer)
+        proceedWithAnswer(isCorrect: userAnswer == currentQuestion.correctAnswer)
     }
     
     func didAnswer(isCorrect: Bool) {
@@ -89,17 +89,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    func showAnswerResult(isCorrect: Bool) {
+    func proceedWithAnswer(isCorrect: Bool) {
         // отображаем результат ответа (выделяем рамкой верный или неверный ответ)
         didAnswer(isCorrect: isCorrect)
         viewController?.highlightImageBorder(isCorrect: isCorrect)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            self.showQuestionOrResult()
+            self.proceedToNextQuestionOrResults()
         }
     }
     
-    func showQuestionOrResult() {
+    func proceedToNextQuestionOrResults() {
         
         if self.isLastQuestion() {
             // показать результат квизa
