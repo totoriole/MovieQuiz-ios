@@ -110,10 +110,14 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             Рекорд: \(statisticService.bestGame.correct ) /\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
             Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
             """
-            let alertModel = QuizResultsViewModel(title: "Этот раунд окончен!",
-                                                  text: text,
-                                                  buttonText: "Сыграть еще раз")
-            viewController?.show(model: alertModel)
+            let alertModel: AlertModel = AlertModel(
+                title: "Этот раунд окончен!",
+                message: text,
+                buttonText: "Сыграть еще раз") { [weak self] in
+                    guard let self = self  else { return }
+                    return self.restartGame()
+                }
+            viewController?.presentAlert(model: alertModel)
             correctAnswers = 0
         } else {
             self.switchToNextQuestion()

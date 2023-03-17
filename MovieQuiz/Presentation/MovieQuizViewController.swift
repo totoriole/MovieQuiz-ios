@@ -14,6 +14,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     private var presenter: MovieQuizPresenter!
+    private var alertPresenter: AlertPresenterProtocol?
     
     // отображение индикатора загрузки
     func showLoadingIndicator() {
@@ -59,12 +60,18 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
+        imageView.layer.borderWidth = 0
+    }
+    
+    func presentAlert(model: AlertModel) {
+        alertPresenter?.presentAlert(model: model)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
         showLoadingIndicator()
+        alertPresenter = AlertPresenter(viewController: self)
     }
     
     func highlightImageBorder(isCorrect: Bool) {

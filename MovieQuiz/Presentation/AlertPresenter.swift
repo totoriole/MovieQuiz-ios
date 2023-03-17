@@ -23,8 +23,4 @@ final class AlertPresenter: AlertPresenterProtocol {
         alert.addAction(action)
         viewController?.present(alert, animated: true)
     }
-    
-//    func restartGame() {
-//        viewController?.viewDidLoad()
-//    }
 }

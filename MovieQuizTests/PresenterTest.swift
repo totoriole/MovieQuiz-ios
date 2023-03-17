@@ -9,30 +9,26 @@ import XCTest
 @testable import MovieQuiz
 
 final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
+    func presentAlert(model: AlertModel) {
+    }
+    
     func showQuestion(quiz step: QuizStepViewModel) {
-        
     }
     
     func show(model: QuizResultsViewModel) {
-        
     }
     
     func highlightImageBorder(isCorrect: Bool) {
-        
     }
     
     func showLoadingIndicator() {
-        
     }
     
     func hideLoadingIndicator() {
-        
     }
     
     func showNetworkError(message: String) {
-        
     }
-    
 }
 
 final class PresenterTest: XCTestCase {
